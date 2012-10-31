@@ -33,6 +33,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # Filter GLIBC_PRIVATE Requires
 %define		_noautoreq	(GLIBC_PRIVATE)
 
+# we don't want these to be provided as system libraries
+%define		_noautoprov		libcrypto.so.1.0.0 libz.so.1 libsqlite3.so.0 libreadline.so.6
+# and as we don't provide them, don't require either
+%define		_noautoreq		%{_noautoprov}
+
 %description
 Insync is Google Drive for business and power users that sync and
 supports multiple accounts and offline Google Docs editing using local
