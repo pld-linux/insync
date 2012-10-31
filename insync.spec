@@ -1,16 +1,18 @@
 # TODO
 # - use python-gdata?
+# - todo, gnome, cinnamon, kde subpackages
+#   https://forums.insynchq.com/discussion/1437/insync-for-linux-beta-4-0-9-19
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
-Version:	0.9.18
-Release:	0.4
+Version:	0.9.19
+Release:	0.5
 License:	?
 Group:		Applications
-Source0:	http://s.insynchq.com/builds/%{name}-beta-%{version}-1.i686.rpm
-# NoSource0-md5:	26d25cf1b929596e07e733ad7db2ec21
+Source0:	http://s.insynchq.com/builds/%{name}-beta-gnome-cinnamon-common-%{version}-1.i686.rpm
+# NoSource0-md5:	116de4a900ab811bcd1f8717d71a7733
 NoSource:	0
-Source1:	http://s.insynchq.com/builds/%{name}-beta-%{version}-1.x86_64.rpm
-# NoSource1-md5:	d4fbc5fc750abd8565e90f30d3f21ba6
+Source1:	http://s.insynchq.com/builds/%{name}-beta-gnome-cinnamon-common-%{version}-1.x86_64.rpm
+# NoSource1-md5:	1ba9d25692397460f380f6d743bfc91b
 NoSource:	0
 URL:		https://www.insynchq.com/
 BuildRequires:	rpm-utils
@@ -22,7 +24,7 @@ Requires:	python-gevent
 Requires:	xdotool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_appdir			%{_prefix}/lib/%{name}
+%define		_appdir			%{_libdir}/%{name}
 %define		nautilus_pyextdir	/usr/share/nautilus-python/extensions
 
 # a zip and executable at the same time
@@ -96,6 +98,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_iconsdir}/hicolor/*/emblems/*.png
 %dir %{_iconsdir}/insync
 %dir %{_iconsdir}/insync/icons
+%{_iconsdir}/insync/*.png
 %{_iconsdir}/insync/icons/*.png
 %{_iconsdir}/insync/icons/*.svg
 %{_desktopdir}/insync.desktop
