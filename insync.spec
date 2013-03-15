@@ -4,15 +4,16 @@
 #   https://forums.insynchq.com/discussion/1437/insync-for-linux-beta-4-0-9-19
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
-Version:	0.9.19
-Release:	0.5
+Version:	0.9.41
+Release:	0.1
 License:	?
 Group:		Applications
+# DownloadUrl: https://www.insynchq.com/linux
 Source0:	http://s.insynchq.com/builds/%{name}-beta-gnome-cinnamon-common-%{version}-1.i686.rpm
-# NoSource0-md5:	116de4a900ab811bcd1f8717d71a7733
+# NoSource0-md5:	7a30c504db7ecf0c4c3c330dc9c4cb5e
 NoSource:	0
 Source1:	http://s.insynchq.com/builds/%{name}-beta-gnome-cinnamon-common-%{version}-1.x86_64.rpm
-# NoSource1-md5:	1ba9d25692397460f380f6d743bfc91b
+# NoSource1-md5:	6de980f9a98d7ed729c6825c05433430
 NoSource:	0
 URL:		https://www.insynchq.com/
 BuildRequires:	rpm-utils
@@ -55,22 +56,18 @@ rpm2cpio $SOURCE | cpio -i -d
 
 mv usr/bin .
 mv usr/lib/insync lib
-mv usr/share/applications/*.desktop .
 mv usr/share/icons .
-mv usr/share/nautilus-python .
 
 # make into symlink, looks cleaner than hardlink:
 # we can attach executable attrs to binary and leave no attrs for symlink in
 # %files section.
+cmp lib/{insync,library.zip}
 ln -sf insync lib/library.zip
-ln -sf insync lib/py
 
-mv bin/%{name} %{name}.orig
-cat > bin/%{name} <<'EOF'
-#!/bin/sh
-cd %{_appdir}
-exec ./%{name} "$@"
-EOF
+%{__sed} -i -e '
+	1s,/bin/bash,/bin/sh,
+	s,/usr/lib/insync,%{_appdir},
+' bin/%{name}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -79,8 +76,6 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_appdir},%{_iconsdir},%{_desktopdir},%{n
 cp -a lib/* $RPM_BUILD_ROOT%{_appdir}
 install -p bin/* $RPM_BUILD_ROOT%{_bindir}
 cp -a icons/* $RPM_BUILD_ROOT%{_iconsdir}
-cp -p insync.desktop $RPM_BUILD_ROOT%{_desktopdir}
-install -p nautilus-python/extensions/*  $RPM_BUILD_ROOT%{nautilus_pyextdir}
 
 %post
 %update_icon_cache hicolor
@@ -98,13 +93,19 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_appdir}
 %attr(755,root,root) %{_appdir}/*.so*
 %attr(755,root,root) %{_appdir}/insync
-%attr(755,root,root) %{_appdir}/py
 %{_appdir}/library.zip
 %{_iconsdir}/hicolor/*/emblems/*.png
 %dir %{_iconsdir}/insync
-%dir %{_iconsdir}/insync/icons
-%{_iconsdir}/insync/*.png
-%{_iconsdir}/insync/icons/*.png
-%{_iconsdir}/insync/icons/*.svg
-%{_desktopdir}/insync.desktop
-%{nautilus_pyextdir}/insync_plugin.py
+%{_iconsdir}/insync/icons
+%{_iconsdir}/insync/Francesco-icons
+
+%dir %{_libdir}/insync/gevent-0.13.8-py*.egg
+%{_libdir}/insync/gevent-0.13.8-py*.egg/EGG-INFO
+%dir %{_libdir}/insync/gevent-0.13.8-py*.egg/gevent
+%{_libdir}/insync/gevent-0.13.8-py*.egg/gevent/*.py[co]
+%attr(755,root,root) %{_libdir}/insync/gevent-0.13.8-py*.egg/gevent/core.so
+
+%dir %{_libdir}/insync/greenlet-0.4.0-py*.egg
+%{_libdir}/insync/greenlet-0.4.0-py*.egg/EGG-INFO
+%{_libdir}/insync/greenlet-0.4.0-py*.egg/greenlet.py[co]
+%attr(755,root,root) %{_libdir}/insync/greenlet-0.4.0-py*.egg/greenlet.so
