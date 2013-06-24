@@ -3,10 +3,12 @@
 # - todo, gnome, cinnamon, kde subpackages
 #   https://forums.insynchq.com/discussion/1437/insync-for-linux-beta-4-0-9-19
 # - if other DE .desktop added, fill them with OnlyShowIn fields
+# - check over bundled libs -- rpm -qp --provides ..| grep ^lib | sed -e 's,(.*,,' | sort -u | sed -e 's,^,/usr/lib64/,' | xargs rpm -qf | sort -u
+#   Qt4, flac, x11*, expat, gst*, vorbis, orc
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
 Version:	0.10.5
-Release:	0.4
+Release:	0.5
 License:	?
 Group:		X11/Applications
 # DownloadUrl: https://www.insynchq.com/linux
@@ -46,7 +48,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoreq	(GLIBC_PRIVATE)
 
 # we don't want these to be provided as system libraries
-%define		_noautoprov		libcrypto.so.1.0.0 libz.so.1 libsqlite3.so.0 libreadline.so.6
+%define		_noautoprov		libcrypto.so.1.0.0 libz.so.1 libsqlite3.so.0 libreadline.so.6 libdbus-glib-1.so.2
 # and as we don't provide them, don't require either
 %define		_noautoreq		%{_noautoprov}
 
