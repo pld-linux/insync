@@ -48,7 +48,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoreq	(GLIBC_PRIVATE)
 
 # we don't want these to be provided as system libraries
-%define		_noautoprov		libcrypto.so.1.0.0 libz.so.1 libsqlite3.so.0 libreadline.so.6 libdbus-glib-1.so.2
+%define		_noautoprov		libcrypto.so.1.0.0 libz.so.1 libsqlite3.so.0 libreadline.so.6 libdbus-glib-1.so.2 libgio-2.0.so.0 libICE.so.6
+
 # and as we don't provide them, don't require either
 %define		_noautoreq		%{_noautoprov}
 
