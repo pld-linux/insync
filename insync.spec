@@ -5,41 +5,42 @@
 # - if other DE .desktop added, fill them with OnlyShowIn fields
 # - check over bundled libs -- rpm -qp --provides ..| grep ^lib | sed -e 's,(.*,,' | sort -u | sed -e 's,^,/usr/lib64/,' | xargs rpm -qf | sort -u
 #   Qt4, flac, x11*, expat, gst*, vorbis, orc
+#
+# Conditional build:
+%bcond_without	mate	# build MATE package (caja integration)
+
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
-Version:	0.10.5
-Release:	0.5
+Version:	1.0.28.31731
+Release:	0.4
 License:	?
 Group:		X11/Applications
 # DownloadUrl: https://www.insynchq.com/linux
-Source0:	http://s.insynchq.com/builds/%{name}-beta_%{version}_i386.deb
-# NoSource0-md5:	1b5f38aa68c8495d51c83d92202b9ce6
+Source0:	http://s.insynchq.com/builds/%{name}_%{version}_i386.deb
+# NoSource0-md5:	2c71e7e6370114a7c5cb008c9c8dad1b
 NoSource:	0
-Source1:	http://s.insynchq.com/builds/%{name}-beta_%{version}_amd64.deb
-# NoSource1-md5:	0397e2edafc3391179c9762254d95789
+Source1:	http://s.insynchq.com/builds/%{name}_%{version}_amd64.deb
+# NoSource1-md5:	973b5ec523ced07e3b82fb032fa4ef93
 NoSource:	0
-Source2:	http://s.insynchq.com/builds/%{name}-beta-mate_%{version}_i386.deb
-# NoSource2-md5:	f6297b2109d2064c8ad95055e5690f66
+Source2:	http://s.insynchq.com/builds/%{name}-caja_%{version}_all.deb
+# NoSource2-md5:	f3d9371544be8f1810de720f8ded05e7
 NoSource:	2
-Source3:	http://s.insynchq.com/builds/%{name}-beta-mate_%{version}_amd64.deb
-# NoSource3-md5:	5d13065677de9d60eec8050efd5cce5b
-NoSource:	2
-URL:		https://www.insynchq.com/
+URL:		https://www.insynchq.com/linux
 BuildRequires:	rpm-utils
 BuildRequires:	sed >= 4.0
 Requires:	glib2
 Requires:	gtk-update-icon-cache
 Requires:	gvfs
-Requires:	nautilus-python
-Requires:	python-gevent
-Requires:	xdotool
+#Requires:	nautilus-python
+#Requires:	python-gevent
+#Requires:	xdotool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_appdir			%{_libdir}/%{name}
 %define		caja_pyextdir	/usr/share/caja-python/extensions
 
-# a zip and executable at the same time
-%define		_noautostrip	.*/library.zip\\|.*/insync\\|.*/py
+# a zip and executable at the same time -- may not strip
+%define		_noautostrip	.*/library.zip\\\\|.*/insync\\\\|.*/py\\\\|*/insync-headless
 
 # bunch of Python symbols
 %define		skip_post_check_so libpyglib-gi-2.0-python2.7.so.0
@@ -70,18 +71,16 @@ Insync context menu and emblems for Mate File Manager (Caja).
 %setup -qcT
 %ifarch %{ix86}
 SOURCE1=%{SOURCE0}
-SOURCE2=%{SOURCE2}
 %endif
 %ifarch %{x8664}
 SOURCE1=%{SOURCE1}
-SOURCE2=%{SOURCE3}
 %endif
-%if 0
-rpm2cpio $SOURCE | cpio -i -d
-%else
+
 ar x $SOURCE1
 tar xzf data.tar.gz
-ar x $SOURCE2
+
+%if %{with mate}
+ar x %{SOURCE2}
 tar xzf data.tar.gz
 %endif
 
@@ -89,21 +88,29 @@ mv usr/bin .
 mv usr/lib/insync lib
 mv usr/share/icons .
 
-# mate
+%if %{with mate}
 mv usr/share/applications/*.desktop .
 cp -p insync.desktop insync-mate.desktop
 mv usr/share/caja-python .
+%endif
 
 # make into symlink, looks cleaner than hardlink:
 # we can attach executable attrs to binary and leave no attrs for symlink in
 # %files section.
 cmp lib/{insync,library.zip}
 ln -sf insync lib/library.zip
+# symlink other identical binaries
+cmp lib/{insync,insync-headless}
+ln -sf insync lib/insync-headless
+cmp lib/{insync,py}
+ln -sf insync lib/py
 
 %{__sed} -i -e '
 	1s,/bin/bash,/bin/sh,
 s,%{_prefix}/lib/insync,%{_appdir},
-' bin/%{name}
+' bin/%{name}*
+
+find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -113,9 +120,10 @@ cp -a lib/* $RPM_BUILD_ROOT%{_appdir}
 install -p bin/* $RPM_BUILD_ROOT%{_bindir}
 cp -a icons/* $RPM_BUILD_ROOT%{_iconsdir}
 
-# mate
+%if %{with mate}
 cp -p insync-mate.desktop $RPM_BUILD_ROOT%{_desktopdir}
 cp -a caja-python/extensions/*  $RPM_BUILD_ROOT%{caja_pyextdir}
+%endif
 
 %post
 %update_icon_cache hicolor
@@ -133,13 +141,15 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_appdir}
 %attr(755,root,root) %{_appdir}/*.so*
 %attr(755,root,root) %{_appdir}/insync
+%attr(755,root,root) %{_appdir}/insync-headless
+%attr(755,root,root) %{_appdir}/py
 %{_appdir}/library.zip
-#%{_iconsdir}/hicolor/*/emblems/*.png
-%dir %{_iconsdir}/insync
-%{_iconsdir}/insync/icons
-#%{_iconsdir}/insync/Francesco-icons
 
-%{_appdir}/res
+%{_appdir}/gdata-2.0.15-py2.7.egg
+%{_appdir}/isyncd.commonlib-0.7.0-py2.7.egg
+%{_appdir}/isyncd.deskcore-1.0.27-py2.7.egg
+%{_appdir}/isyncd.irp-0.1.0-py2.7.egg
+
 %dir %{_appdir}/gevent-0.13.8-py*.egg
 %{_appdir}/gevent-0.13.8-py*.egg/EGG-INFO
 %dir %{_appdir}/gevent-0.13.8-py*.egg/gevent
@@ -172,6 +182,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_appdir}/raven-3.1.0-py*.egg/raven
 %{_appdir}/raven-3.1.0-py*.egg/EGG-INFO
 
+%{_iconsdir}/hicolor/*/apps/insync.svg
+%{_iconsdir}/hicolor/*/mimetypes/application-vnd.insync.link.drive.*.png
+%{_iconsdir}/hicolor/*/mimetypes/gd*.png
+%{_iconsdir}/hicolor/*/places/insync-folder.png
+%{_iconsdir}/hicolor/*/status/insync*.png
+
+# wtf. resolve later
+%dir %{_iconsdir}/hicolor/*/status/48x48
+%{_iconsdir}/hicolor/*/status/48x48/insync-*.png
+
+%if %{with mate}
 %files -n caja-insync
 %defattr(644,root,root,755)
 %{_desktopdir}/insync-mate.desktop
@@ -182,3 +203,4 @@ rm -rf $RPM_BUILD_ROOT
 # FIXME
 %dir %{caja_pyextdir}
 %dir %{_datadir}/caja-python
+%endif
