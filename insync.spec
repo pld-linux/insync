@@ -1,7 +1,6 @@
 # TODO
 # - use python-gdata?
-# - todo, gnome, cinnamon, kde subpackages
-#   https://forums.insynchq.com/discussion/1437/insync-for-linux-beta-4-0-9-19
+# - dolphin (kde), nautilus (gnome), nemo (???), thunar (xfce) subpackages
 # - if other DE .desktop added, fill them with OnlyShowIn fields
 # - check over bundled libs -- rpm -qp --provides ..| grep ^lib | sed -e 's,(.*,,' | sort -u | sed -e 's,^,/usr/lib64/,' | xargs rpm -qf | sort -u
 #   Qt4, flac, x11*, expat, gst*, vorbis, orc
@@ -12,7 +11,7 @@
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
 Version:	1.0.28.31731
-Release:	0.6
+Release:	0.7
 License:	?
 Group:		X11/Applications
 # DownloadUrl: https://www.insynchq.com/linux
@@ -36,7 +35,7 @@ Requires:	gvfs
 #Requires:	xdotool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_appdir			%{_libdir}/%{name}
+%define		_appdir			%{_prefix}/lib/%{name}
 %define		caja_pyextdir	/usr/share/caja-python/extensions
 
 # a zip and executable at the same time -- may not strip
