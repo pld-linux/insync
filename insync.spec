@@ -1,6 +1,6 @@
 # TODO
 # - use python-gdata?
-# - dolphin (kde), nautilus (gnome), nemo (???), thunar (xfce) subpackages
+# - dolphin (kde), nautilus (gnome), nemo (mint/cinnamon), thunar (xfce) subpackages
 # - if other DE .desktop added, fill them with OnlyShowIn fields
 # - check over bundled libs -- rpm -qp --provides ..| grep ^lib | sed -e 's,(.*,,' | sort -u | sed -e 's,^,/usr/lib64/,' | xargs rpm -qf | sort -u
 #   Qt4, flac, x11*, expat, gst*, vorbis, orc
@@ -11,7 +11,7 @@
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
 Version:	1.0.28.31731
-Release:	0.7
+Release:	0.9
 License:	?
 Group:		X11/Applications
 # DownloadUrl: https://www.insynchq.com/linux
@@ -61,7 +61,7 @@ applications.
 %package -n caja-insync
 Summary:	Insync context menu and emblems for Caja
 Requires:	%{name} = %{version}-%{release}
-Requires:	mate-file-manager
+Requires:	caja
 
 %description -n caja-insync
 Insync context menu and emblems for Mate File Manager (Caja).
