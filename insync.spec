@@ -12,15 +12,15 @@
 Summary:	Insync - Your Google Docs backup and sync tool
 Name:		insync
 Version:	1.0.28.31731
-Release:	0.4
+Release:	0.6
 License:	?
 Group:		X11/Applications
 # DownloadUrl: https://www.insynchq.com/linux
-Source0:	http://s.insynchq.com/builds/%{name}_%{version}_i386.deb
-# NoSource0-md5:	2c71e7e6370114a7c5cb008c9c8dad1b
+Source0:	http://s.insynchq.com/builds/%{name}-%{version}-1.i686.rpm
+# NoSource0-md5:	5459d29ce0e5b7fb7aae4c5ca52981b3
 NoSource:	0
-Source1:	http://s.insynchq.com/builds/%{name}_%{version}_amd64.deb
-# NoSource1-md5:	973b5ec523ced07e3b82fb032fa4ef93
+Source1:	http://s.insynchq.com/builds/%{name}-%{version}-1.x86_64.rpm
+# NoSource1-md5:	aab26fd8635e7151e09872a93f02af65
 NoSource:	0
 Source2:	http://s.insynchq.com/builds/%{name}-caja_%{version}_all.deb
 # NoSource2-md5:	f3d9371544be8f1810de720f8ded05e7
@@ -76,8 +76,7 @@ SOURCE1=%{SOURCE0}
 SOURCE1=%{SOURCE1}
 %endif
 
-ar x $SOURCE1
-tar xzf data.tar.gz
+rpm2cpio $SOURCE1 | cpio -i -d
 
 %if %{with mate}
 ar x %{SOURCE2}
@@ -85,7 +84,7 @@ tar xzf data.tar.gz
 %endif
 
 mv usr/bin .
-mv usr/lib/insync lib
+mv usr/lib*/insync lib
 mv usr/share/icons .
 
 %if %{with mate}
